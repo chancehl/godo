@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -37,4 +38,50 @@ func InitializeDotDir() error {
 	}
 
 	return nil
+}
+
+func CheckIfGistIdFileExists() bool {
+	homeDir, _ := os.UserHomeDir()
+
+	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+
+	return true
+}
+
+func WriteGistIdFile(id string) (string, error) {
+	homeDir, err := os.UserHomeDir()
+
+	if err != nil {
+		fmt.Printf("error getting user home directory: %s", err)
+		return "", err
+	}
+
+	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+	os.WriteFile(path, []byte(id), 0644)
+
+	return path, nil
+}
+
+func ReadGistIdFile() (string, error) {
+	homeDir, err := os.UserHomeDir()
+
+	if err != nil {
+		fmt.Printf("error getting user home directory: %s", err)
+		return "", err
+	}
+
+	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+
+	data, err := os.ReadFile(path)
+
+	if err != nil {
+		fmt.Printf("error reading gist_file_id file: %s", err)
+		return "", err
+	}
+
+	return string(data), nil
 }

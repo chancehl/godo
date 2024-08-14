@@ -24,7 +24,7 @@ func GetGithubClient(ctx context.Context) *github.Client {
 	return githubClient
 }
 
-func CreateGist(items []model.GodoItem) *string {
+func CreateGist(items []model.GodoItem) (string, string, error) {
 	ctx := context.Background()
 
 	githubClient := GetGithubClient(ctx)
@@ -45,8 +45,8 @@ func CreateGist(items []model.GodoItem) *string {
 
 	if err != nil {
 		fmt.Println("Error creating gist:", err)
-		return nil
+		return "", *createdGist.HTMLURL, err
 	}
 
-	return createdGist.HTMLURL
+	return *createdGist.ID, *createdGist.HTMLURL, nil
 }
