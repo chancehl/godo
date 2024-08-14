@@ -9,7 +9,7 @@ import (
 
 func ConfirmAction(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("%s (y/n): ", prompt)
+	fmt.Println(prompt)
 	response, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println("Error reading input:", err)

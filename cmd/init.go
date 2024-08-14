@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/chancehl/godo/internal/clients"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -20,50 +22,56 @@ var initCmd = &cobra.Command{
 }
 
 func executeInit(cmd *cobra.Command, args []string) {
-	exists := config.CheckIfGistIdFileExists()
+	configExists, _ := config.CheckIfGistIdFileExists()
 
-	if exists {
-		existingId, _ := config.ReadGistIdFile()
-
-		prompt := fmt.Sprintf(`
-You have already initialized godo in the past and have a stored gist id of:
-
-%s
-
-Are you sure you want to proceed?
-`, existingId)
-
-		confirmation := utils.ConfirmAction(prompt)
-
-		if !confirmation {
-			fmt.Println("Did not create gist_file_id file. Aborting.")
+	if configExists {
+		if !handleExistingGist() {
+			color.Yellow("Initialization aborted by the user.")
 			return
 		}
 	}
 
-	id, gist, err := clients.CreateGist(make([]model.GodoItem, 0))
-
+	id, gistURL, err := clients.CreateGist([]model.GodoItem{})
 	if err != nil {
-		fmt.Printf("Encountered error when creating gist: %s", err)
+		log.Fatalf("Error creating gist: %v", err)
 	}
 
-	gist_id_file, err := config.WriteGistIdFile(id)
-
+	gistIDFilePath, err := config.WriteGistIdFile(id)
 	if err != nil {
-		fmt.Printf("Failed to write gist id file: %s", err)
+		log.Fatalf("Error writing gist ID file: %v", err)
 	}
 
+	displayInitializationDetails(id, gistURL, gistIDFilePath)
+	color.Green("Successfully initialized godo")
+}
+
+func handleExistingGist() bool {
+	existingID, err := config.ReadGistIdFile()
+	if err != nil {
+		log.Fatalf("Error reading existing gist ID: %v", err)
+	}
+
+	prompt := fmt.Sprintf(`
+You have already initialized godo with the following gist ID:
+
+%s
+
+Are you sure you want to reinitialize? (y/n): `, existingID)
+
+	return utils.ConfirmAction(prompt)
+}
+
+func displayInitializationDetails(id, gistURL, gistIDFilePath string) {
 	message := fmt.Sprintf(`
-Github:
+GitHub Details:
 
-* %s
-* %s
+* Gist ID: %s
+* Gist URL: %s
 
-Local:
+Local Details:
 
-* %s
-`, id, gist, gist_id_file)
+* Gist ID File Path: %s
+`, id, gistURL, gistIDFilePath)
 
 	fmt.Println(message)
-	fmt.Println("\033[32mSuccessfully initialized godo!\033[0m")
 }
