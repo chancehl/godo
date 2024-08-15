@@ -50,3 +50,42 @@ func CreateGist(items []model.GodoItem) (string, string, error) {
 
 	return *createdGist.ID, *createdGist.HTMLURL, nil
 }
+
+func ReadGist(id string) ([]model.GodoItem, error) {
+	ctx := context.Background()
+
+	githubClient := GetGithubClient(ctx)
+	gist, resp, err := githubClient.Gists.Get(ctx, id)
+
+	if err != nil || resp.StatusCode != 200 {
+		fmt.Printf("Failed to fetch gist with id %s: %s", id, gist)
+		return []model.GodoItem{}, err
+	}
+
+	content := *gist.Files["godo.json"].Content
+
+	var items []model.GodoItem
+
+	if err := json.Unmarshal([]byte(content), &items); err != nil {
+		fmt.Printf("Failed to parse godo items from gist content: %s, %s", content, err)
+		return []model.GodoItem{}, nil
+	}
+
+	return items, nil
+}
+
+func UpdateGist(id string, items []model.GodoItem) {
+	ctx := context.Background()
+
+	gistContent, _ := json.Marshal(items)
+	gist := &github.Gist{
+		Files: map[github.GistFilename]github.GistFile{
+			"godo.json": {
+				Content: github.String(string(gistContent)),
+			},
+		},
+	}
+
+	githubClient := GetGithubClient(ctx)
+	githubClient.Gists.Edit(ctx, id, gist)
+}

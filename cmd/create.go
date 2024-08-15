@@ -1,8 +1,10 @@
 package cmd
 
 import (
-	"fmt"
+	"time"
 
+	"github.com/chancehl/godo/internal/clients"
+	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/spf13/cobra"
 )
@@ -20,11 +22,15 @@ var createCmd = &cobra.Command{
 func executeCreate(cmd *cobra.Command, args []string) {
 	item := args[0]
 
-	items := []model.GodoItem{
-		{Name: "TODO1"},
-		{Name: "TODO2"},
-		{Name: item},
-	}
+	id, _ := config.ReadGistIdFile()
+	godos, _ := clients.ReadGist(id)
 
-	fmt.Println(items)
+	newGodo := model.GodoItem{
+		Name:      item,
+		Status:    "TODO",
+		CreatedOn: time.Now().UTC().Format(time.RFC3339),
+	}
+	godos = append(godos, newGodo)
+
+	clients.UpdateGist(id, godos)
 }

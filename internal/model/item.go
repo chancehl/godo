@@ -1,5 +1,8 @@
 package model
 
 type GodoItem struct {
-	Name string
+	Name        string
+	Status      string
+	CompletedOn string
+	CreatedOn   string
 }
