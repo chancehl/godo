@@ -74,10 +74,15 @@ func ReadGist(id string) ([]model.GodoItem, error) {
 	return items, nil
 }
 
-func UpdateGist(id string, items []model.GodoItem) {
+func UpdateGist(id string, items []model.GodoItem) error {
 	ctx := context.Background()
 
-	gistContent, _ := json.Marshal(items)
+	gistContent, err := json.Marshal(items)
+
+	if err != nil {
+		return fmt.Errorf("could not serialize items: %s", err)
+	}
+
 	gist := &github.Gist{
 		Files: map[github.GistFilename]github.GistFile{
 			"godo.json": {
@@ -87,5 +92,11 @@ func UpdateGist(id string, items []model.GodoItem) {
 	}
 
 	githubClient := GetGithubClient(ctx)
-	githubClient.Gists.Edit(ctx, id, gist)
+	_, resp, err := githubClient.Gists.Edit(ctx, id, gist)
+
+	if err != nil || resp.StatusCode != 200 {
+		return fmt.Errorf("failed to update gist: %s", err)
+	}
+
+	return nil
 }
