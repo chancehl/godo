@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/chancehl/godo/internal/clients"
+	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/fatih/color"
@@ -33,7 +33,7 @@ func executeInit(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	id, gistURL, err := clients.CreateGist([]model.GodoItem{})
+	id, gistURL, err := github.CreateGist([]model.GodoItem{})
 	if err != nil {
 		log.Fatalf("Error creating gist: %v", err)
 	}

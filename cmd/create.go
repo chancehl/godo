@@ -3,10 +3,11 @@ package cmd
 import (
 	"time"
 
-	"github.com/chancehl/godo/internal/clients"
+	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/fatih/color"
+	"github.com/lithammer/shortuuid/v4"
 	"github.com/spf13/cobra"
 )
 
@@ -34,13 +35,14 @@ func executeCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	godos, err := clients.ReadGist(id)
+	godos, err := github.ReadGist(id)
 	if err != nil {
 		cmd.PrintErrln("Error reading Gist:", err)
 		return
 	}
 
 	newGodo := model.GodoItem{
+		ID:        shortuuid.New()[:8],
 		Name:      item,
 		Status:    "TODO",
 		CreatedOn: time.Now().UTC().Format(time.RFC3339),
@@ -48,7 +50,7 @@ func executeCreate(cmd *cobra.Command, args []string) {
 
 	godos = append(godos, newGodo)
 
-	if err := clients.UpdateGist(id, godos); err != nil {
+	if err := github.UpdateGist(id, godos); err != nil {
 		cmd.PrintErrln("Error updating Gist:", err)
 	} else {
 		color.Green("Successfully created godo item")
