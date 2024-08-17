@@ -10,64 +10,63 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var deleteGodoItem bool
+
 func init() {
 	completeCmd.Flags().BoolVarP(&deleteGodoItem, "delete", "d", false, "Delete an item as you complete it")
-
 	rootCmd.AddCommand(completeCmd)
 }
 
-var deleteGodoItem bool
-
 var completeCmd = &cobra.Command{
 	Use:  "complete [item]",
-	Run:  executeComplete,
 	Args: cobra.ExactArgs(1),
+	RunE: executeComplete, // Use RunE to handle errors better
 }
 
-func executeComplete(cmd *cobra.Command, args []string) {
-	if len(args) == 0 {
-		cmd.PrintErrln("Error: Missing item argument")
-		return
-	}
-
-	item := args[0]
-
-	itemID, err := strconv.Atoi(item)
+func executeComplete(cmd *cobra.Command, args []string) error {
+	itemID, err := strconv.Atoi(args[0])
 	if err != nil {
-		cmd.PrintErrln("Could not convert item ID to integer")
-		return
+		return cmdError(cmd, "Could not convert item ID to integer", err)
 	}
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		cmd.PrintErrln("Could not read gist id from config file: ", err)
-		return
+		return cmdError(cmd, "Could not read gist ID from config file", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		cmd.PrintErrln("Could not fetch godods from github: ", err)
-		return
+		return cmdError(cmd, "Could not fetch godos from GitHub", err)
 	}
 
-	newGodos := []model.GodoItem{}
+	updatedGodos := updateGodos(godos, itemID)
+
+	if err := github.UpdateGist(gistID, updatedGodos); err != nil {
+		return cmdError(cmd, "Failed to update godos", err)
+	}
+
+	return nil
+}
+
+func updateGodos(godos []model.GodoItem, itemID int) []model.GodoItem {
+	var updatedGodos []model.GodoItem
 
 	for index, godo := range godos {
 		if index+1 == itemID {
-			completedOn := time.Now().UTC().Format(time.RFC3339)
-
-			godo.CompletedOn = completedOn
+			godo.CompletedOn = time.Now().UTC().Format(time.RFC3339)
 			godo.Status = "COMPLETE"
 
-			if !deleteGodoItem {
-				newGodos = append(newGodos, godo)
+			if deleteGodoItem {
+				continue
 			}
-		} else {
-			newGodos = append(newGodos, godo)
 		}
+		updatedGodos = append(updatedGodos, godo)
 	}
 
-	if err := github.UpdateGist(gistID, newGodos); err != nil {
-		cmd.PrintErrln("Failed to update godos: ", err)
-	}
+	return updatedGodos
+}
+
+func cmdError(cmd *cobra.Command, msg string, err error) error {
+	cmd.PrintErrln(msg+":", err)
+	return err
 }
