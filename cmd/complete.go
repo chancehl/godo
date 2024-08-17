@@ -6,13 +6,17 @@ import (
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
-	"github.com/fatih/color"
+	"github.com/chancehl/godo/internal/model"
 	"github.com/spf13/cobra"
 )
 
 func init() {
+	completeCmd.Flags().BoolVarP(&deleteGodoItem, "delete", "d", false, "Delete an item as you complete it")
+
 	rootCmd.AddCommand(completeCmd)
 }
+
+var deleteGodoItem bool
 
 var completeCmd = &cobra.Command{
 	Use:  "complete [item]",
@@ -46,18 +50,24 @@ func executeComplete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	for index := range godos {
+	newGodos := []model.GodoItem{}
+
+	for index, godo := range godos {
 		if index+1 == itemID {
 			completedOn := time.Now().UTC().Format(time.RFC3339)
 
-			godos[index].CompletedOn = completedOn
-			godos[index].Status = "COMPLETE"
+			godo.CompletedOn = completedOn
+			godo.Status = "COMPLETE"
 
-			color.Green("Complete!")
+			if !deleteGodoItem {
+				newGodos = append(newGodos, godo)
+			}
+		} else {
+			newGodos = append(newGodos, godo)
 		}
 	}
 
-	if err := github.UpdateGist(gistID, godos); err != nil {
+	if err := github.UpdateGist(gistID, newGodos); err != nil {
 		cmd.PrintErrln("Failed to update godos: ", err)
 	}
 }
