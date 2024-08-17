@@ -29,13 +29,13 @@ func executeCreate(cmd *cobra.Command, args []string) {
 
 	item := args[0]
 
-	id, err := config.ReadGistIdFile()
+	gistID, err := config.ReadGistIdFile()
 	if err != nil {
 		cmd.PrintErrln("Error reading Gist ID:", err)
 		return
 	}
 
-	godos, err := github.ReadGist(id)
+	godos, err := github.GetGodos(gistID)
 	if err != nil {
 		cmd.PrintErrln("Error reading Gist:", err)
 		return
@@ -50,9 +50,10 @@ func executeCreate(cmd *cobra.Command, args []string) {
 
 	godos = append(godos, newGodo)
 
-	if err := github.UpdateGist(id, godos); err != nil {
+	if err := github.UpdateGist(gistID, godos); err != nil {
 		cmd.PrintErrln("Error updating Gist:", err)
-	} else {
-		color.Green("Successfully created godo item")
+		return
 	}
+
+	color.Green("Created!")
 }

@@ -25,7 +25,7 @@ func executeList(cmd *cobra.Command, args []string) {
 		cmd.PrintErrln("Failed to read gist id from local config: ", err)
 	}
 
-	items, err := github.ReadGist(gistID)
+	items, err := github.GetGodos(gistID)
 	if err != nil {
 		cmd.PrintErrln("Failed to fetch godo items: ", err)
 	}
@@ -34,11 +34,10 @@ func executeList(cmd *cobra.Command, args []string) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.DiscardEmptyColumns)
 
 	// Print table header
-	fmt.Fprintln(w, "ID\tNAME\tSTATUS\tCREATED ON\tCOMPLETED ON\t")
+	fmt.Fprintln(w, "TASK. NO\tID\tNAME\tSTATUS\tCREATED ON\tCOMPLETED ON\t")
 
-	// Print each client in a new row
-	for _, item := range items {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", item.ID, item.Name, item.Status, item.CreatedOn)
+	for index, item := range items {
+		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\t\n", index+1, item.ID, item.Name, item.Status, item.CreatedOn, item.CompletedOn)
 	}
 
 	w.Flush()

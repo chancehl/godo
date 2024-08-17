@@ -51,7 +51,7 @@ func CreateGist(items []model.GodoItem) (string, string, error) {
 	return *createdGist.ID, *createdGist.HTMLURL, nil
 }
 
-func ReadGist(id string) ([]model.GodoItem, error) {
+func GetGodos(id string) ([]model.GodoItem, error) {
 	ctx := context.Background()
 
 	githubClient := GetGithubClient(ctx)
