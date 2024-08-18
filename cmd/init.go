@@ -8,7 +8,6 @@ import (
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils/cli"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -17,23 +16,23 @@ func init() {
 }
 
 var initCmd = &cobra.Command{
-	Use: "init",
-	Run: executeInit,
+	Use:  "init",
+	RunE: executeInit,
 }
 
-func executeInit(cmd *cobra.Command, args []string) {
+func executeInit(cmd *cobra.Command, args []string) error {
 	configExists, _ := config.CheckIfGistIdFileExists()
 
 	if configExists {
 		if !handleExistingGist() {
-			color.Yellow("Initialization aborted by the user.")
-			return
+			fmt.Println("Initialization aborted by the user.")
+			return nil
 		}
 	}
 
 	id, gistURL, err := github.CreateGist([]model.GodoItem{})
 	if err != nil {
-		log.Fatalf("Error creating gist: %v", err)
+		return cli.CmdError(cmd, "Error creating gist: %v", err)
 	}
 
 	gistIDFilePath, err := config.WriteGistIdFile(id)
@@ -42,7 +41,10 @@ func executeInit(cmd *cobra.Command, args []string) {
 	}
 
 	displayInitializationDetails(id, gistURL, gistIDFilePath)
-	color.Green("Successfully initialized godo")
+
+	fmt.Println("Successfully initialized godo")
+
+	return nil
 }
 
 func handleExistingGist() bool {

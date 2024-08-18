@@ -7,7 +7,6 @@ import (
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils/cli"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +44,7 @@ func handleClearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoIt
 	confirmationPrompt := "This action will delete ALL godo items. Continue? (y/n): "
 
 	if !cli.ConfirmAction(confirmationPrompt) {
-		color.Yellow("Clear all aborted by the user.")
+		fmt.Println("Clear all aborted by user")
 		return nil
 	}
 
@@ -53,7 +52,7 @@ func handleClearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoIt
 		return cli.CmdError(cmd, "Failed to update godos", err)
 	}
 
-	color.Green(fmt.Sprintf("Removed %d godo items from list", len(godos)))
+	fmt.Printf("Removed %d godo items from list", len(godos))
 	return nil
 }
 
@@ -69,14 +68,14 @@ func handleClearCompletedItems(cmd *cobra.Command, gistID string, godos []model.
 	toBeDeleted := len(godos) - len(updatedGodos)
 
 	if toBeDeleted == 0 {
-		color.Yellow("No items were deleted")
+		fmt.Println("No items were deleted")
 		return nil
 	}
 
 	confirmationPrompt := fmt.Sprintf("This action will delete %d godo items. Continue? (y/n): ", toBeDeleted)
 
 	if !cli.ConfirmAction(confirmationPrompt) {
-		color.Yellow("Clear aborted by the user.")
+		fmt.Println("Clear aborted by the user.")
 		return nil
 	}
 
@@ -84,6 +83,6 @@ func handleClearCompletedItems(cmd *cobra.Command, gistID string, godos []model.
 		return cli.CmdError(cmd, "Failed to update godos", err)
 	}
 
-	color.Green(fmt.Sprintf("Removed %d godo items from list", toBeDeleted))
+	fmt.Printf("Removed %d godo item(s) from list\n", toBeDeleted)
 	return nil
 }

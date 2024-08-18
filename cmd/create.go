@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
-	"github.com/fatih/color"
 	"github.com/lithammer/shortuuid/v4"
 	"github.com/spf13/cobra"
 )
@@ -55,5 +55,5 @@ func executeCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	color.Green("Created!")
+	fmt.Println("Created godo item:", item)
 }

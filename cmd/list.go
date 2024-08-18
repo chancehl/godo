@@ -7,6 +7,8 @@ import (
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
+	"github.com/chancehl/godo/internal/model"
+	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -15,21 +17,27 @@ func init() {
 }
 
 var listCommand = &cobra.Command{
-	Use: "list",
-	Run: executeList,
+	Use:  "list",
+	RunE: executeList,
 }
 
-func executeList(cmd *cobra.Command, args []string) {
+func executeList(cmd *cobra.Command, args []string) error {
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		cmd.PrintErrln("Failed to read gist id from local config: ", err)
+		return cli.CmdError(cmd, "Failed to read gist id from local config: ", err)
 	}
 
 	items, err := github.GetGodos(gistID)
 	if err != nil {
-		cmd.PrintErrln("Failed to fetch godo items: ", err)
+		return cli.CmdError(cmd, "Failed to fetch godo items: ", err)
 	}
 
+	printList(items)
+
+	return nil
+}
+
+func printList(items []model.GodoItem) {
 	// Create a new tabwriter
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.DiscardEmptyColumns)
 
