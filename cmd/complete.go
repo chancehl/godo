@@ -54,7 +54,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		updatedGodos = append(updatedGodos, godo)
 	}
 
-	if err := github.UpdateGist(gistID, updatedGodos); err != nil {
+	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
 		return cli.CmdError(cmd, "Failed to update godos", err)
 	}
 

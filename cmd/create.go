@@ -50,7 +50,7 @@ func executeCreate(cmd *cobra.Command, args []string) {
 
 	godos = append(godos, newGodo)
 
-	if err := github.UpdateGist(gistID, godos); err != nil {
+	if err := github.UpdateGodos(gistID, godos); err != nil {
 		cmd.PrintErrln("Error updating Gist:", err)
 		return
 	}

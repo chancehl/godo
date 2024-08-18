@@ -1,15 +1,13 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
+	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -60,19 +58,7 @@ You have already initialized godo with the following gist ID:
 
 Are you sure you want to reinitialize? (y/n): `, existingID)
 
-	return confirmAction(prompt)
-}
-
-func confirmAction(prompt string) bool {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println(prompt)
-	response, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("Error reading input:", err)
-		return false
-	}
-	response = strings.TrimSpace(strings.ToLower(response))
-	return response == "y" || response == "yes"
+	return cli.ConfirmAction(prompt)
 }
 
 func displayInitializationDetails(id, gistURL, gistIDFilePath string) {

@@ -74,7 +74,7 @@ func GetGodos(id string) ([]model.GodoItem, error) {
 	return items, nil
 }
 
-func UpdateGist(id string, items []model.GodoItem) error {
+func UpdateGodos(id string, items []model.GodoItem) error {
 	ctx := context.Background()
 
 	gistContent, err := json.Marshal(items)
