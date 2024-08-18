@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
@@ -11,20 +10,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var deleteGodoItem bool
-
 func init() {
-	completeCmd.Flags().BoolVarP(&deleteGodoItem, "delete", "d", false, "Delete an item as you complete it")
-	rootCmd.AddCommand(completeCmd)
+	rootCmd.AddCommand(startcmd)
 }
 
-var completeCmd = &cobra.Command{
-	Use:  "complete [item]",
+var startcmd = &cobra.Command{
+	Use:  "start [item]",
 	Args: cobra.ExactArgs(1),
-	RunE: executeComplete, // Use RunE to handle errors better
+	RunE: executeStart,
 }
 
-func executeComplete(cmd *cobra.Command, args []string) error {
+func executeStart(cmd *cobra.Command, args []string) error {
 	itemID, err := strconv.Atoi(args[0])
 	if err != nil {
 		return cli.CmdError(cmd, "Could not convert item ID to integer", err)
@@ -44,8 +40,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 
 	for index, godo := range godos {
 		if index+1 == itemID {
-			godo.CompletedOn = time.Now().UTC().Format(time.RFC3339)
-			godo.Status = "COMPLETE"
+			godo.Status = "IN_PROGRESS"
 
 			if deleteGodoItem {
 				continue
