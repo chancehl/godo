@@ -11,7 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var clearAll bool
+
 func init() {
+	clearCmd.Flags().BoolVarP(&clearAll, "all", "a", false, "Clear all items (instead of just completed ones)")
 	rootCmd.AddCommand(clearCmd)
 }
 
@@ -31,6 +34,30 @@ func executeClear(cmd *cobra.Command, args []string) error {
 		return cli.CmdError(cmd, "Could not fetch godos from GitHub", err)
 	}
 
+	if clearAll {
+		return handleClearAllItems(cmd, gistID, godos)
+	} else {
+		return handleClearCompletedItems(cmd, gistID, godos)
+	}
+}
+
+func handleClearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
+	confirmationPrompt := "This action will delete ALL godo items. Continue? (y/n): "
+
+	if !cli.ConfirmAction(confirmationPrompt) {
+		color.Yellow("Clear all aborted by the user.")
+		return nil
+	}
+
+	if err := github.UpdateGodos(gistID, []model.GodoItem{}); err != nil {
+		return cli.CmdError(cmd, "Failed to update godos", err)
+	}
+
+	color.Green(fmt.Sprintf("Removed %d godo items from list", len(godos)))
+	return nil
+}
+
+func handleClearCompletedItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
 	var updatedGodos []model.GodoItem
 
 	for _, godo := range godos {
