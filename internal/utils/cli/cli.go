@@ -2,12 +2,18 @@ package cli
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
+
+func CmdErrorS(cmd *cobra.Command, msg string) error {
+	cmd.PrintErrln(msg)
+	return errors.New(msg)
+}
 
 func CmdError(cmd *cobra.Command, msg string, err error) error {
 	cmd.PrintErrln(msg+":", err)

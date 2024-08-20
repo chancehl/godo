@@ -25,7 +25,7 @@ var createCmd = &cobra.Command{
 
 func executeCreate(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("missing item argument")
+		return cli.CmdErrorS(cmd, "missing item argument")
 	}
 
 	item := args[0]
