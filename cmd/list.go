@@ -35,14 +35,14 @@ func executeList(cmd *cobra.Command, args []string) error {
 	// Create a new tabwriter
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.DiscardEmptyColumns)
 
-	headers := []string{"TASK. NO", "ID", "NAME", "STATUS", "NOTES", "CREATED ON", "COMPLETED ON"}
+	headers := []string{"TASK. NO", "ID", "NAME", "NOTES", "STATUS", "CREATED ON", "COMPLETED ON"}
 	header := strings.Join(headers, "\t")
 
 	// Print table header
 	fmt.Fprintln(w, header)
 
 	for index, item := range items {
-		fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\t%s\t\n", index+1, item.ID, item.Name, item.Status, item.Notes, item.CreatedOn, item.CompletedOn)
+		fmt.Fprintf(w, "(%d)\t%s\t%s\t%s\t%s\t%s\t%s\t\n", index+1, item.ID, item.Name, item.Notes, item.Status, item.CreatedOn, item.CompletedOn)
 	}
 
 	w.Flush()
