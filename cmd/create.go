@@ -42,7 +42,7 @@ func executeCreate(cmd *cobra.Command, args []string) {
 	}
 
 	newGodo := model.GodoItem{
-		ID:        shortuuid.New()[:8],
+		ID:        shortuuid.New()[:12],
 		Name:      item,
 		Status:    "TODO",
 		CreatedOn: time.Now().UTC().Format(time.RFC3339),
