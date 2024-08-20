@@ -41,7 +41,7 @@ func executeClear(cmd *cobra.Command, args []string) error {
 }
 
 func handleClearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
-	confirmationPrompt := "This action will delete ALL godo items. Continue? (y/n): "
+	confirmationPrompt := "This action will delete ALL godo items. This is permanent and cannot be undone. Continue? (y/n): "
 
 	if !cli.ConfirmAction(confirmationPrompt) {
 		fmt.Println("Clear all aborted by user")

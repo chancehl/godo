@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	createCmd.PersistentFlags().StringP("notes", "n", "", "The notes to associate with the godo item")
 	rootCmd.AddCommand(createCmd)
 }
 
@@ -41,11 +42,13 @@ func executeCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	notes, _ := cmd.Flags().GetString("notes")
 	newGodo := model.GodoItem{
 		ID:        shortuuid.New()[:12],
 		Name:      item,
 		Status:    "TODO",
 		CreatedOn: time.Now().UTC().Format(time.RFC3339),
+		Notes:     notes,
 	}
 
 	godos = append(godos, newGodo)
