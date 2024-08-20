@@ -7,6 +7,7 @@ import (
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
+	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/lithammer/shortuuid/v4"
 	"github.com/spf13/cobra"
 )
@@ -18,28 +19,25 @@ func init() {
 
 var createCmd = &cobra.Command{
 	Use:  "create [item]",
-	Run:  executeCreate,
+	RunE: executeCreate,
 	Args: cobra.ExactArgs(1),
 }
 
-func executeCreate(cmd *cobra.Command, args []string) {
+func executeCreate(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		cmd.PrintErrln("Error: Missing item argument")
-		return
+		return fmt.Errorf("missing item argument")
 	}
 
 	item := args[0]
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		cmd.PrintErrln("Error reading Gist ID:", err)
-		return
+		return cli.CmdError(cmd, "Error reading gist id: ", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		cmd.PrintErrln("Error reading Gist:", err)
-		return
+		return cli.CmdError(cmd, "Error reading gist: ", err)
 	}
 
 	notes, _ := cmd.Flags().GetString("notes")
@@ -54,9 +52,9 @@ func executeCreate(cmd *cobra.Command, args []string) {
 	godos = append(godos, newGodo)
 
 	if err := github.UpdateGodos(gistID, godos); err != nil {
-		cmd.PrintErrln("Error updating Gist:", err)
-		return
+		return cli.CmdError(cmd, "Error updating gist: ", err)
 	}
 
 	fmt.Println("Created godo item:", item)
+	return nil
 }
