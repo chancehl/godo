@@ -22,12 +22,15 @@ func CmdError(cmd *cobra.Command, msg string, err error) error {
 
 func ConfirmAction(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println(prompt)
+
+	fmt.Printf("%s Would you like to continue? (y/n): ", prompt)
+
 	response, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println("Error reading input:", err)
 		return false
 	}
+
 	response = strings.TrimSpace(strings.ToLower(response))
 	return response == "y" || response == "yes"
 }

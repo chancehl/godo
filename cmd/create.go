@@ -19,11 +19,11 @@ func init() {
 
 var createCmd = &cobra.Command{
 	Use:  "create [item]",
-	RunE: executeCreate,
+	RunE: createGodo,
 	Args: cobra.ExactArgs(1),
 }
 
-func executeCreate(cmd *cobra.Command, args []string) error {
+func createGodo(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return cli.CmdErrorS(cmd, "missing item argument")
 	}
@@ -40,7 +40,16 @@ func executeCreate(cmd *cobra.Command, args []string) error {
 		return cli.CmdError(cmd, "Error reading gist: ", err)
 	}
 
+	if exists, existing := checkIfAlreadyExists(item, godos); exists && existing.Status != "COMPLETED" {
+		prompt := fmt.Sprintf("Looks like you already have an incomplete godo item with the name \"%s\".", existing.Name)
+
+		if !cli.ConfirmAction(prompt) {
+			return nil
+		}
+	}
+
 	notes, _ := cmd.Flags().GetString("notes")
+
 	newGodo := model.GodoItem{
 		ID:        shortuuid.New()[:12],
 		Name:      item,
@@ -55,6 +64,15 @@ func executeCreate(cmd *cobra.Command, args []string) error {
 		return cli.CmdError(cmd, "Error updating gist: ", err)
 	}
 
-	fmt.Println("Created godo item:", item)
+	fmt.Printf("Added \"%s\" to your godo list.\n", item)
 	return nil
+}
+
+func checkIfAlreadyExists(item string, items []model.GodoItem) (bool, *model.GodoItem) {
+	for _, existing := range items {
+		if existing.Name == item {
+			return true, &existing
+		}
+	}
+	return false, nil
 }

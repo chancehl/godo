@@ -77,8 +77,7 @@ func GetGodos(id string) ([]model.GodoItem, error) {
 func UpdateGodos(id string, items []model.GodoItem) error {
 	ctx := context.Background()
 
-	gistContent, err := json.Marshal(items)
-
+	content, err := json.Marshal(items)
 	if err != nil {
 		return fmt.Errorf("could not serialize items: %s", err)
 	}
@@ -86,7 +85,7 @@ func UpdateGodos(id string, items []model.GodoItem) error {
 	gist := &github.Gist{
 		Files: map[github.GistFilename]github.GistFile{
 			"godo.json": {
-				Content: github.String(string(gistContent)),
+				Content: github.String(string(content)),
 			},
 		},
 	}
