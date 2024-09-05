@@ -24,19 +24,19 @@ var createCmd = &cobra.Command{
 
 func createGodo(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		return cli.CmdErrorS(cmd, "missing item argument")
+		return fmt.Errorf("missing item argument")
 	}
 
 	item := args[0]
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return cli.CmdError(cmd, "Error reading gist id: ", err)
+		return fmt.Errorf("error reading gist id from file (%s)", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		return cli.CmdError(cmd, "Error reading gist: ", err)
+		return fmt.Errorf("error reading gist file from github (%s)", err)
 	}
 
 	if exists, existing := checkIfAlreadyExists(item, godos); exists && existing.Status != "COMPLETED" {
@@ -62,7 +62,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 	godos = append(godos, newGodo)
 
 	if err := github.UpdateGodos(gistID, godos); err != nil {
-		return cli.CmdError(cmd, "Error updating gist: ", err)
+		return fmt.Errorf("error updating gist (%s)", err)
 	}
 
 	fmt.Printf("Added \"%s\" to your godo list.\n", item)

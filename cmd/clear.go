@@ -25,26 +25,26 @@ var clearCmd = &cobra.Command{
 func executeClear(cmd *cobra.Command, args []string) error {
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return cli.CmdError(cmd, "Could not read gist ID from config file", err)
+		return fmt.Errorf("could not read gist ID from config file (%s)", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		return cli.CmdError(cmd, "Could not fetch godos from GitHub", err)
+		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
 
-	return clearItems(clearAll, cmd, gistID, godos)
+	return clearItems(clearAll, gistID, godos)
 }
 
-func clearItems(all bool, cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
+func clearItems(all bool, gistID string, godos []model.GodoItem) error {
 	if all {
-		return clearAllItems(cmd, gistID, godos)
+		return clearAllItems(gistID, godos)
 	}
 
-	return clearCompletedItems(cmd, gistID, godos)
+	return clearCompletedItems(gistID, godos)
 }
 
-func clearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
+func clearAllItems(gistID string, godos []model.GodoItem) error {
 	confirmationPrompt := "This action will delete ALL godo items. This is permanent and cannot be undone."
 
 	if !cli.ConfirmAction(confirmationPrompt) {
@@ -53,14 +53,14 @@ func clearAllItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) er
 	}
 
 	if err := github.UpdateGodos(gistID, []model.GodoItem{}); err != nil {
-		return cli.CmdError(cmd, "Failed to update godos", err)
+		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
 	fmt.Printf("Removed %d godo items from list\n", len(godos))
 	return nil
 }
 
-func clearCompletedItems(cmd *cobra.Command, gistID string, godos []model.GodoItem) error {
+func clearCompletedItems(gistID string, godos []model.GodoItem) error {
 	var updatedGodos []model.GodoItem
 
 	for _, godo := range godos {
@@ -79,7 +79,7 @@ func clearCompletedItems(cmd *cobra.Command, gistID string, godos []model.GodoIt
 	}
 
 	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
-		return cli.CmdError(cmd, "Failed to update godos", err)
+		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
 	fmt.Printf("Cleared all completed godo item(s) from list\n")

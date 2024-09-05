@@ -32,7 +32,7 @@ func executeInit(cmd *cobra.Command, args []string) error {
 
 	id, gistURL, err := github.CreateGist([]model.GodoItem{})
 	if err != nil {
-		return cli.CmdError(cmd, "Error creating gist: %v", err)
+		return fmt.Errorf("error creating gist (%v)", err)
 	}
 
 	gistIDFilePath, err := config.WriteGistIdFile(id)

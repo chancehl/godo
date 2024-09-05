@@ -58,7 +58,6 @@ func GetGodos(id string) ([]model.GodoItem, error) {
 	gist, resp, err := githubClient.Gists.Get(ctx, id)
 
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Printf("Failed to fetch gist with id %s: %s", id, gist)
 		return []model.GodoItem{}, err
 	}
 

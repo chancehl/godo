@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
-	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -27,17 +27,22 @@ var completeCmd = &cobra.Command{
 func executeComplete(cmd *cobra.Command, args []string) error {
 	itemID, err := strconv.Atoi(args[0])
 	if err != nil {
-		return cli.CmdError(cmd, "Could not convert item ID to integer", err)
+		return fmt.Errorf("could not convert id to integer")
 	}
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return cli.CmdError(cmd, "Could not read gist ID from config file", err)
+		return fmt.Errorf("could not read gist id from config file (%s)", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		return cli.CmdError(cmd, "Could not fetch godos from GitHub", err)
+		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
+	}
+
+	idExists := checkIfIdExists(itemID, godos)
+	if !idExists {
+		return fmt.Errorf("invalid item id: %d", itemID)
 	}
 
 	var updatedGodos []model.GodoItem
@@ -54,9 +59,14 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		updatedGodos = append(updatedGodos, godo)
 	}
 
-	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
-		return cli.CmdError(cmd, "Failed to update godos", err)
-	}
+	return github.UpdateGodos(gistID, updatedGodos)
+}
 
-	return nil
+func checkIfIdExists(id int, items []model.GodoItem) bool {
+	for _, item := range items {
+		if item.ID == id {
+			return true
+		}
+	}
+	return false
 }

@@ -18,8 +18,12 @@ func init() {
 }
 
 func Execute() {
+	rootCmd.SilenceErrors = true
+	rootCmd.SilenceUsage = true
+
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, "⚠️ ", err)
+		fmt.Fprintln(os.Stderr, "\nRun 'godo complete --help' for usage details.")
 		os.Exit(1)
 	}
 }

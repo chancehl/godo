@@ -10,7 +10,6 @@ import (
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
-	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -29,12 +28,12 @@ var listCommand = &cobra.Command{
 func executeList(cmd *cobra.Command, args []string) error {
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return cli.CmdError(cmd, "Failed to read gist id from local config: ", err)
+		return fmt.Errorf("failed to read gist id from local config (%s)", err)
 	}
 
 	items, err := github.GetGodos(gistID)
 	if err != nil {
-		return cli.CmdError(cmd, "Failed to fetch godo items: ", err)
+		return fmt.Errorf("failed to fetch godo items (%s)", err)
 	}
 
 	sort, _ := cmd.Flags().GetString("sort")

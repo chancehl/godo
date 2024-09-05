@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
-	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -23,17 +23,17 @@ var startcmd = &cobra.Command{
 func executeStart(cmd *cobra.Command, args []string) error {
 	itemID, err := strconv.Atoi(args[0])
 	if err != nil {
-		return cli.CmdError(cmd, "Could not convert item ID to integer", err)
+		return fmt.Errorf("Could not convert item ID to integer", err)
 	}
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return cli.CmdError(cmd, "Could not read gist ID from config file", err)
+		return fmt.Errorf("Could not read gist ID from config file", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		return cli.CmdError(cmd, "Could not fetch godos from GitHub", err)
+		return fmt.Errorf("Could not fetch godos from GitHub", err)
 	}
 
 	var updatedGodos []model.GodoItem
@@ -50,7 +50,7 @@ func executeStart(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
-		return cli.CmdError(cmd, "Failed to update godos", err)
+		return fmt.Errorf("Failed to update godos", err)
 	}
 
 	return nil
