@@ -8,7 +8,6 @@ import (
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils/cli"
-	"github.com/lithammer/shortuuid/v4"
 	"github.com/spf13/cobra"
 )
 
@@ -50,8 +49,10 @@ func createGodo(cmd *cobra.Command, args []string) error {
 
 	notes, _ := cmd.Flags().GetString("notes")
 
+	id := generateID(godos)
+
 	newGodo := model.GodoItem{
-		ID:        shortuuid.New()[:12],
+		ID:        id,
 		Name:      item,
 		Status:    "TODO",
 		CreatedOn: time.Now().UTC().Format(time.RFC3339),
@@ -75,4 +76,20 @@ func checkIfAlreadyExists(item string, items []model.GodoItem) (bool, *model.God
 		}
 	}
 	return false, nil
+}
+
+func generateID(items []model.GodoItem) int {
+	if len(items) == 0 {
+		return 1
+	}
+
+	max := 0
+
+	for _, item := range items {
+		if item.ID > max {
+			max = item.ID
+		}
+	}
+
+	return max + 1
 }

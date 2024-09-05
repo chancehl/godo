@@ -58,7 +58,7 @@ You have already initialized godo with the following gist ID:
 
 %s
 
-Are you sure you want to reinitialize? (y/n): `, existingID)
+Are you sure you want to reinitialize?`, existingID)
 
 	return cli.ConfirmAction(prompt)
 }

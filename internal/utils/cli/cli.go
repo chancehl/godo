@@ -23,7 +23,7 @@ func CmdError(cmd *cobra.Command, msg string, err error) error {
 func ConfirmAction(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("%s Would you like to continue? (y/n): ", prompt)
+	fmt.Printf("%s Continue? (y/n): ", prompt)
 
 	response, err := reader.ReadString('\n')
 	if err != nil {
