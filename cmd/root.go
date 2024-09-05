@@ -22,8 +22,7 @@ func Execute() {
 	rootCmd.SilenceUsage = true
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, "⚠️ ", err)
-		fmt.Fprintln(os.Stderr, "\nRun 'godo complete --help' for usage details.")
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

@@ -40,7 +40,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 	}
 
 	if exists, existing := checkIfAlreadyExists(item, godos); exists && existing.Status != "COMPLETED" {
-		prompt := fmt.Sprintf("Looks like you already have an incomplete godo item with the name \"%s\".", existing.Name)
+		prompt := fmt.Sprintf("It looks like you already have an incomplete godo item with the name \"%s\". Would you like to create a duplicate item?", existing.Name)
 
 		if !cli.ConfirmAction(prompt) {
 			return nil
@@ -65,7 +65,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("error updating gist (%s)", err)
 	}
 
-	fmt.Printf("Added \"%s\" to your godo list.\n", item)
+	fmt.Printf("👍 added \"%s\" to your godo list\n", item)
 	return nil
 }
 

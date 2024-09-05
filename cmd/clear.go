@@ -48,7 +48,7 @@ func clearAllItems(gistID string, godos []model.GodoItem) error {
 	confirmationPrompt := "This action will delete ALL godo items. This is permanent and cannot be undone."
 
 	if !cli.ConfirmAction(confirmationPrompt) {
-		fmt.Println("Clear all aborted by user")
+		fmt.Println("clear all aborted by user")
 		return nil
 	}
 
@@ -56,7 +56,7 @@ func clearAllItems(gistID string, godos []model.GodoItem) error {
 		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
-	fmt.Printf("Removed %d godo items from list\n", len(godos))
+	fmt.Printf("🧹 removed %d godo items from list\n", len(godos))
 	return nil
 }
 
@@ -69,8 +69,9 @@ func clearCompletedItems(gistID string, godos []model.GodoItem) error {
 		}
 	}
 
-	if (len(godos) - len(updatedGodos)) == 0 {
-		fmt.Println("No completed items to clear.")
+	updated := len(godos) - len(updatedGodos)
+	if updated == 0 {
+		fmt.Println("no completed items to clear")
 		return nil
 	}
 
@@ -82,6 +83,6 @@ func clearCompletedItems(gistID string, godos []model.GodoItem) error {
 		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
-	fmt.Printf("Cleared all completed godo item(s) from list\n")
+	fmt.Printf("🧹 cleared %d completed godo item(s) from list\n", updated)
 	return nil
 }

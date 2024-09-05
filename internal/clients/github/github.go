@@ -42,9 +42,7 @@ func CreateGist(items []model.GodoItem) (string, string, error) {
 	}
 
 	createdGist, _, err := githubClient.Gists.Create(ctx, gist)
-
 	if err != nil {
-		fmt.Println("Error creating gist:", err)
 		return "", *createdGist.HTMLURL, err
 	}
 

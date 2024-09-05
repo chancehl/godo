@@ -10,11 +10,11 @@ import (
 func ConfirmAction(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Printf("%s Continue? (y/n): ", prompt)
+	fmt.Printf("⚠️  %s (y/n): ", prompt)
 
 	response, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Println("Error reading input:", err)
+		fmt.Println("error reading input:", err)
 		return false
 	}
 

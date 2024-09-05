@@ -25,7 +25,7 @@ func executeInit(cmd *cobra.Command, args []string) error {
 
 	if configExists {
 		if !handleExistingGist() {
-			fmt.Println("Initialization aborted by the user.")
+			fmt.Println("initialization aborted by the user")
 			return nil
 		}
 	}
@@ -42,8 +42,7 @@ func executeInit(cmd *cobra.Command, args []string) error {
 
 	displayInitializationDetails(id, gistURL, gistIDFilePath)
 
-	fmt.Println("Successfully initialized godo")
-
+	fmt.Println("⚡ successfully initialized godo")
 	return nil
 }
 
