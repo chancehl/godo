@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/chancehl/godo/internal/model"
@@ -11,23 +12,41 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func GetGithubClient(ctx context.Context) *github.Client {
+func GetGithubClientAccessToken(ctx context.Context) (string, error) {
 	envFileData, _ := godotenv.Read(".env")
 
 	accessToken := envFileData["GITHUB_ACCESS_TOKEN"]
+
+	if accessToken == "" {
+		return "", errors.New("could not locate GITHUB_ACCESS_TOKEN environment variable in .env file")
+	}
+
+	return accessToken, nil
+}
+
+func GetGithubClient(ctx context.Context) (*github.Client, error) {
+	accessToken, err := GetGithubClientAccessToken(ctx)
+
+	if err != nil {
+		return nil, err
+	}
 
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
 	tokenClient := oauth2.NewClient(ctx, tokenSource)
 
 	githubClient := github.NewClient(tokenClient)
 
-	return githubClient
+	return githubClient, nil
 }
 
 func CreateGist(items []model.GodoItem) (string, string, error) {
 	ctx := context.Background()
 
-	githubClient := GetGithubClient(ctx)
+	githubClient, err := GetGithubClient(ctx)
+
+	if err != nil {
+		return "", "", err
+	}
 
 	gistContent, _ := json.Marshal(items)
 
@@ -52,7 +71,12 @@ func CreateGist(items []model.GodoItem) (string, string, error) {
 func GetGodos(id string) ([]model.GodoItem, error) {
 	ctx := context.Background()
 
-	githubClient := GetGithubClient(ctx)
+	githubClient, err := GetGithubClient(ctx)
+
+	if err != nil {
+		return []model.GodoItem{}, err
+	}
+
 	gist, resp, err := githubClient.Gists.Get(ctx, id)
 
 	if err != nil || resp.StatusCode != 200 {
@@ -87,7 +111,11 @@ func UpdateGodos(id string, items []model.GodoItem) error {
 		},
 	}
 
-	githubClient := GetGithubClient(ctx)
+	githubClient, err := GetGithubClient(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to update godos (%s)", err)
+	}
+
 	_, resp, err := githubClient.Gists.Edit(ctx, id, gist)
 
 	if err != nil || resp.StatusCode != 200 {
