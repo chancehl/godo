@@ -7,8 +7,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/chancehl/godo/internal/clients/github"
-	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/spf13/cobra"
 )
@@ -26,12 +24,7 @@ var listCommand = &cobra.Command{
 }
 
 func executeList(cmd *cobra.Command, args []string) error {
-	gistID, err := config.ReadGistIdFile()
-	if err != nil {
-		return fmt.Errorf("failed to read gist id from local config (%s)", err)
-	}
-
-	items, err := github.GetGodos(gistID)
+	items, err := appCtx.GodoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("failed to fetch godo items (%s)", err)
 	}

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chancehl/godo/internal/clients/github"
-	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
@@ -29,12 +27,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 
 	item := args[0]
 
-	gistID, err := config.ReadGistIdFile()
-	if err != nil {
-		return fmt.Errorf("error reading gist id from file (%s)", err)
-	}
-
-	godos, err := github.GetGodos(gistID)
+	godos, err := appCtx.GodoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("error reading gist file from github (%s)", err)
 	}
@@ -61,7 +54,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 
 	godos = append(godos, newGodo)
 
-	if err := github.UpdateGodos(gistID, godos); err != nil {
+	if err := appCtx.GodoService.UpdateGodos(godos); err != nil {
 		return fmt.Errorf("error updating gist (%s)", err)
 	}
 

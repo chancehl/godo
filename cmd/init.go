@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/chancehl/godo/internal/clients/github"
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/chancehl/godo/internal/utils/cli"
@@ -46,7 +45,7 @@ func createOrUpdateGistFile(existing *GodoGistData) error {
 		gistID = existing.id
 		gistURL = existing.url
 	} else {
-		newGistID, newGistURL, err := github.CreateGist([]model.GodoItem{})
+		newGistID, newGistURL, err := appCtx.GithubService.CreateGist([]model.GodoItem{})
 		if err != nil {
 			return fmt.Errorf("failed to create gist: %w", err)
 		}
@@ -90,7 +89,7 @@ func handleExistingConfig() error {
 }
 
 func findExistingGodoGist() (*GodoGistData, error) {
-	gists, _, err := github.GetGists()
+	gists, _, err := appCtx.GithubService.GetGists()
 	if err != nil {
 		return nil, fmt.Errorf("error fetching gists: %w", err)
 	}

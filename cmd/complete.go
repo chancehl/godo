@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/chancehl/godo/internal/clients/github"
-	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/spf13/cobra"
 )
@@ -30,12 +28,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("could not convert id to integer")
 	}
 
-	gistID, err := config.ReadGistIdFile()
-	if err != nil {
-		return fmt.Errorf("could not read gist id from config file (%s)", err)
-	}
-
-	godos, err := github.GetGodos(gistID)
+	godos, err := appCtx.GodoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
@@ -64,7 +57,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		updatedGodos = append(updatedGodos, godo)
 	}
 
-	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
+	if err := appCtx.GodoService.UpdateGodos(updatedGodos); err != nil {
 		return fmt.Errorf("could not update godos (%s)", err)
 	}
 
