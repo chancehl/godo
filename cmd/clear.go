@@ -38,7 +38,7 @@ func clearItems(all bool, godos []model.GodoItem) error {
 }
 
 func clearAllItems(godos []model.GodoItem) error {
-	if !cli.ConfirmAction("This action will delete ALL godo items. This is permanent and cannot be undone. Continue?") {
+	if !cli.ConfirmAction(fmt.Sprintf("This action will delete ALL %d items in your godo list. This is permanent and cannot be undone. Continue?", len(godos))) {
 		fmt.Println("clear all aborted by user")
 		return nil
 	}
