@@ -3,7 +3,6 @@ package github
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/chancehl/godo/internal/model"
@@ -12,24 +11,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func GetGithubClientAccessToken(ctx context.Context) (string, error) {
+func GetGithubClient(ctx context.Context) (*github.Client, error) {
 	envFileData, _ := godotenv.Read(".env")
 
 	accessToken := envFileData["GITHUB_ACCESS_TOKEN"]
-
-	if accessToken == "" {
-		return "", errors.New("could not locate GITHUB_ACCESS_TOKEN environment variable in .env file")
-	}
-
-	return accessToken, nil
-}
-
-func GetGithubClient(ctx context.Context) (*github.Client, error) {
-	accessToken, err := GetGithubClientAccessToken(ctx)
-
-	if err != nil {
-		return nil, err
-	}
 
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
 	tokenClient := oauth2.NewClient(ctx, tokenSource)
@@ -123,4 +108,16 @@ func UpdateGodos(id string, items []model.GodoItem) error {
 	}
 
 	return nil
+}
+
+func GetGists() ([]*github.Gist, *github.Response, error) {
+	ctx := context.Background()
+
+	client, err := GetGithubClient(ctx)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return client.Gists.List(ctx, "", &github.GistListOptions{})
 }

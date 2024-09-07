@@ -23,17 +23,17 @@ var startcmd = &cobra.Command{
 func executeStart(cmd *cobra.Command, args []string) error {
 	itemID, err := strconv.Atoi(args[0])
 	if err != nil {
-		return fmt.Errorf("Could not convert item ID to integer", err)
+		return fmt.Errorf("could not convert item ID to integer (%s)", err)
 	}
 
 	gistID, err := config.ReadGistIdFile()
 	if err != nil {
-		return fmt.Errorf("Could not read gist ID from config file", err)
+		return fmt.Errorf("could not read gist ID from config file (%s)", err)
 	}
 
 	godos, err := github.GetGodos(gistID)
 	if err != nil {
-		return fmt.Errorf("Could not fetch godos from GitHub", err)
+		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
 
 	var updatedGodos []model.GodoItem
@@ -50,7 +50,7 @@ func executeStart(cmd *cobra.Command, args []string) error {
 	}
 
 	if err := github.UpdateGodos(gistID, updatedGodos); err != nil {
-		return fmt.Errorf("Failed to update godos", err)
+		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
 	return nil
