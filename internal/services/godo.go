@@ -9,19 +9,18 @@ import (
 	"github.com/google/go-github/v50/github"
 )
 
-type godoService interface {
-	GetGodos(id string) ([]model.GodoItem, error)
-	UpdateGodos(items []model.GodoItem) error
-}
-
 type GodoService struct {
 	githubClient *github.Client
 	context      context.Context
 	gistID       string
 }
 
-func NewGodoService(githubClient *github.Client, context context.Context, gistID string) *GodoService {
-	return &GodoService{githubClient, context, gistID}
+func NewGodoService(githubClient *github.Client, gistID string) *GodoService {
+	return &GodoService{
+		context:      context.Background(),
+		githubClient: githubClient,
+		gistID:       gistID,
+	}
 }
 
 func (service *GodoService) GetGodos() ([]model.GodoItem, error) {

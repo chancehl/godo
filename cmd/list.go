@@ -24,7 +24,7 @@ var listCommand = &cobra.Command{
 }
 
 func executeList(cmd *cobra.Command, args []string) error {
-	items, err := appCtx.GodoService.GetGodos()
+	items, err := godoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("failed to fetch godo items (%s)", err)
 	}

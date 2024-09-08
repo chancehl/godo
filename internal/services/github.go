@@ -13,18 +13,13 @@ const GistFileDescription = "godo"
 const GistFilePublic = false
 const GistFileName = "godo.json"
 
-type githubService interface {
-	CreateGist(godos []model.GodoItem) (string, string, error)
-	GetGists() ([]*github.Gist, *github.Response, error)
-}
-
 type GithubService struct {
 	githubClient *github.Client
 	context      context.Context
 }
 
-func NewGithubService(githubClient *github.Client, context context.Context) *GithubService {
-	return &GithubService{githubClient, context}
+func NewGithubService(githubClient *github.Client) *GithubService {
+	return &GithubService{githubClient: githubClient, context: context.Background()}
 }
 
 func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string, error) {

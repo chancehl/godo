@@ -46,7 +46,7 @@ func createOrUpdateGistFile(existing *GodoGistData) error {
 		gistID = existing.id
 		gistURL = existing.url
 	} else {
-		newGistID, newGistURL, err := appCtx.GithubService.CreateGist([]model.GodoItem{})
+		newGistID, newGistURL, err := githubService.CreateGist([]model.GodoItem{})
 		if err != nil {
 			return fmt.Errorf("failed to create gist: %w", err)
 		}
@@ -90,7 +90,7 @@ func handleExistingConfig() error {
 }
 
 func findExistingGodoGist() (*GodoGistData, error) {
-	gists, _, err := appCtx.GithubService.GetGists()
+	gists, _, err := githubService.GetGists()
 	if err != nil {
 		return nil, fmt.Errorf("error fetching gists: %w", err)
 	}

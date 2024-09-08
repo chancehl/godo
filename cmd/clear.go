@@ -11,7 +11,11 @@ import (
 var clearAll bool
 
 func init() {
+
+	// register flag
 	clearCmd.Flags().BoolVarP(&clearAll, "all", "a", false, "Clear all items (instead of just completed ones)")
+
+	// register cmd
 	rootCmd.AddCommand(clearCmd)
 }
 
@@ -21,11 +25,10 @@ var clearCmd = &cobra.Command{
 }
 
 func executeClear(cmd *cobra.Command, args []string) error {
-	godos, err := appCtx.GodoService.GetGodos()
+	godos, err := godoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
-
 	return clearItems(clearAll, godos)
 }
 
@@ -43,7 +46,7 @@ func clearAllItems(godos []model.GodoItem) error {
 		return nil
 	}
 
-	if err := appCtx.GodoService.UpdateGodos([]model.GodoItem{}); err != nil {
+	if err := godoService.UpdateGodos([]model.GodoItem{}); err != nil {
 		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 
@@ -70,7 +73,7 @@ func clearCompletedItems(godos []model.GodoItem) error {
 		return nil
 	}
 
-	if err := appCtx.GodoService.UpdateGodos(updatedGodos); err != nil {
+	if err := godoService.UpdateGodos(updatedGodos); err != nil {
 		return fmt.Errorf("failed to update godos (%s)", err)
 	}
 

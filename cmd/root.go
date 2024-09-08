@@ -14,7 +14,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var appCtx *appContext.AppContext
+var applicationContext *appContext.ApplicationContext
+var godoService *services.GodoService
+var githubService *services.GithubService
 
 var rootCmd = &cobra.Command{
 	Use:   "godo",
@@ -36,11 +38,10 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("could not read local gist id file (err=%s)", err)
 		}
 
-		githubService := services.NewGithubService(githubClient, backgroundCtx)
-		godoService := services.NewGodoService(githubClient, backgroundCtx, gistID)
+		applicationContext = applicationContext.NewApplicationContext(gistID)
 
-		// instantiate app ctx
-		appCtx = appCtx.NewAppContext(gistID, godoService, githubService)
+		githubService = services.NewGithubService(githubClient)
+		godoService = services.NewGodoService(githubClient, gistID)
 
 		return nil
 	},

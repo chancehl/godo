@@ -27,7 +27,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 
 	item := args[0]
 
-	godos, err := appCtx.GodoService.GetGodos()
+	godos, err := godoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("error reading gist file from github (%s)", err)
 	}
@@ -54,7 +54,7 @@ func createGodo(cmd *cobra.Command, args []string) error {
 
 	godos = append(godos, newGodo)
 
-	if err := appCtx.GodoService.UpdateGodos(godos); err != nil {
+	if err := godoService.UpdateGodos(godos); err != nil {
 		return fmt.Errorf("error updating gist (%s)", err)
 	}
 

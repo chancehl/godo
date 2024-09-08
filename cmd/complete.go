@@ -12,7 +12,10 @@ import (
 var deleteGodoItem bool
 
 func init() {
+	// register flags
 	completeCmd.Flags().BoolVarP(&deleteGodoItem, "delete", "d", false, "Delete an item as you complete it")
+
+	// register cmd
 	rootCmd.AddCommand(completeCmd)
 }
 
@@ -28,7 +31,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("could not convert id to integer")
 	}
 
-	godos, err := appCtx.GodoService.GetGodos()
+	godos, err := godoService.GetGodos()
 	if err != nil {
 		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
@@ -57,7 +60,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		updatedGodos = append(updatedGodos, godo)
 	}
 
-	if err := appCtx.GodoService.UpdateGodos(updatedGodos); err != nil {
+	if err := godoService.UpdateGodos(updatedGodos); err != nil {
 		return fmt.Errorf("could not update godos (%s)", err)
 	}
 

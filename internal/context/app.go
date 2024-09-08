@@ -1,19 +1,9 @@
 package context
 
-import (
-	"github.com/chancehl/godo/internal/services"
-)
-
-type AppContext struct {
-	GistID        string
-	GodoService   *services.GodoService
-	GithubService *services.GithubService
+type ApplicationContext struct {
+	GistID string
 }
 
-func (ctx *AppContext) NewAppContext(gistID string, godoService *services.GodoService, githubService *services.GithubService) *AppContext {
-	return &AppContext{
-		GistID:        gistID,
-		GodoService:   godoService,
-		GithubService: githubService,
-	}
+func (ctx *ApplicationContext) NewApplicationContext(gistID string) *ApplicationContext {
+	return &ApplicationContext{GistID: gistID}
 }
