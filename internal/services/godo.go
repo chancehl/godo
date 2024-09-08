@@ -24,8 +24,8 @@ func NewGodoService(githubClient *github.Client, context context.Context, gistID
 	return &GodoService{githubClient, context, gistID}
 }
 
-func (s *GodoService) GetGodos() ([]model.GodoItem, error) {
-	gist, resp, err := s.githubClient.Gists.Get(s.context, s.gistID)
+func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
+	gist, resp, err := service.githubClient.Gists.Get(service.context, service.gistID)
 
 	if err != nil || resp.StatusCode != 200 {
 		return []model.GodoItem{}, err
@@ -42,7 +42,7 @@ func (s *GodoService) GetGodos() ([]model.GodoItem, error) {
 	return items, nil
 }
 
-func (s *GodoService) UpdateGodos(godos []model.GodoItem) error {
+func (service *GodoService) UpdateGodos(godos []model.GodoItem) error {
 	content, err := json.Marshal(godos)
 	if err != nil {
 		return fmt.Errorf("could not serialize items: %s", err)
@@ -56,8 +56,8 @@ func (s *GodoService) UpdateGodos(godos []model.GodoItem) error {
 		},
 	}
 
-	_, resp, err := s.githubClient.Gists.Edit(s.context, s.gistID, gist)
-	if err != nil || resp.StatusCode != 200 {
+	_, _, err = service.githubClient.Gists.Edit(service.context, service.gistID, gist)
+	if err != nil {
 		return fmt.Errorf("failed to update gist: %s", err)
 	}
 

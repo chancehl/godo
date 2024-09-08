@@ -23,7 +23,7 @@ func NewGithubService(githubClient *github.Client, context context.Context) *Git
 	return &GithubService{githubClient, context}
 }
 
-func (s *GithubService) CreateGist(godos []model.GodoItem) (string, string, error) {
+func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string, error) {
 	ctx := context.Background()
 
 	gistContent, _ := json.Marshal(godos)
@@ -38,7 +38,7 @@ func (s *GithubService) CreateGist(godos []model.GodoItem) (string, string, erro
 		},
 	}
 
-	createdGist, _, err := s.githubClient.Gists.Create(ctx, gist)
+	createdGist, _, err := service.githubClient.Gists.Create(ctx, gist)
 	if err != nil {
 		return "", *createdGist.HTMLURL, fmt.Errorf("failed to create gist file (err=%s)", err)
 	}
@@ -46,6 +46,6 @@ func (s *GithubService) CreateGist(godos []model.GodoItem) (string, string, erro
 	return *createdGist.ID, *createdGist.HTMLURL, nil
 }
 
-func (s *GithubService) GetGists() ([]*github.Gist, *github.Response, error) {
-	return s.githubClient.Gists.List(s.context, "", &github.GistListOptions{})
+func (service *GithubService) GetGists() ([]*github.Gist, *github.Response, error) {
+	return service.githubClient.Gists.List(service.context, "", &github.GistListOptions{})
 }
