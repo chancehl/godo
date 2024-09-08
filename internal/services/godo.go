@@ -1,30 +1,23 @@
 package services
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 
+	appContext "github.com/chancehl/godo/internal/context"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/google/go-github/v50/github"
 )
 
 type GodoService struct {
-	githubClient *github.Client
-	context      context.Context
-	gistID       string
-}
-
-func NewGodoService(githubClient *github.Client, gistID string) *GodoService {
-	return &GodoService{
-		context:      context.Background(),
-		githubClient: githubClient,
-		gistID:       gistID,
-	}
+	GithubService      *GithubService
+	ApplicationContext *appContext.ApplicationContext
 }
 
 func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
-	gist, resp, err := service.githubClient.Gists.Get(service.context, service.gistID)
+	gistID := service.ApplicationContext.GistID
+
+	gist, resp, err := service.GithubService.GetGist(gistID)
 
 	if err != nil || resp.StatusCode != 200 {
 		return []model.GodoItem{}, err
@@ -42,6 +35,8 @@ func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
 }
 
 func (service *GodoService) UpdateGodos(godos []model.GodoItem) error {
+	gistID := service.ApplicationContext.GistID
+
 	content, err := json.Marshal(godos)
 	if err != nil {
 		return fmt.Errorf("could not serialize items: %s", err)
@@ -55,7 +50,7 @@ func (service *GodoService) UpdateGodos(godos []model.GodoItem) error {
 		},
 	}
 
-	_, _, err = service.githubClient.Gists.Edit(service.context, service.gistID, gist)
+	_, _, err = service.GithubService.EditGist(gistID, gist)
 	if err != nil {
 		return fmt.Errorf("failed to update gist: %s", err)
 	}

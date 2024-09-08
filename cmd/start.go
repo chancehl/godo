@@ -31,13 +31,9 @@ func executeStart(cmd *cobra.Command, args []string) error {
 
 	var updatedGodos []model.GodoItem
 
-	for index, godo := range godos {
-		if index+1 == itemID {
+	for _, godo := range godos {
+		if godo.ID == itemID {
 			godo.Status = "IN_PROGRESS"
-
-			if deleteGodoItem {
-				continue
-			}
 		}
 		updatedGodos = append(updatedGodos, godo)
 	}

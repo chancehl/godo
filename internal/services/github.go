@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	appContext "github.com/chancehl/godo/internal/context"
 	"github.com/chancehl/godo/internal/model"
 	"github.com/google/go-github/v50/github"
 )
@@ -14,17 +15,12 @@ const GistFilePublic = false
 const GistFileName = "godo.json"
 
 type GithubService struct {
-	githubClient *github.Client
-	context      context.Context
-}
-
-func NewGithubService(githubClient *github.Client) *GithubService {
-	return &GithubService{githubClient: githubClient, context: context.Background()}
+	GithubClient       *github.Client
+	Context            *context.Context
+	ApplicationContext *appContext.ApplicationContext
 }
 
 func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string, error) {
-	ctx := context.Background()
-
 	gistContent, _ := json.Marshal(godos)
 
 	gist := &github.Gist{
@@ -37,7 +33,7 @@ func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string
 		},
 	}
 
-	createdGist, _, err := service.githubClient.Gists.Create(ctx, gist)
+	createdGist, _, err := service.GithubClient.Gists.Create(*service.Context, gist)
 	if err != nil {
 		return "", *createdGist.HTMLURL, fmt.Errorf("failed to create gist file (err=%s)", err)
 	}
@@ -46,5 +42,13 @@ func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string
 }
 
 func (service *GithubService) GetGists() ([]*github.Gist, *github.Response, error) {
-	return service.githubClient.Gists.List(service.context, "", &github.GistListOptions{})
+	return service.GithubClient.Gists.List(*service.Context, "", &github.GistListOptions{})
+}
+
+func (service *GithubService) GetGist(id string) (*github.Gist, *github.Response, error) {
+	return service.GithubClient.Gists.Get(*service.Context, id)
+}
+
+func (service *GithubService) EditGist(id string, gist *github.Gist) (*github.Gist, *github.Response, error) {
+	return service.GithubClient.Gists.Edit(*service.Context, id, gist)
 }

@@ -48,8 +48,8 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 
 	var updatedGodos []model.GodoItem
 
-	for index, godo := range godos {
-		if index+1 == itemID {
+	for _, godo := range godos {
+		if godo.ID == itemID {
 			godo.CompletedOn = time.Now().UTC().Format(time.RFC3339)
 			godo.Status = "COMPLETE"
 

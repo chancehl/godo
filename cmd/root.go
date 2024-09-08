@@ -22,14 +22,14 @@ var rootCmd = &cobra.Command{
 	Use:   "godo",
 	Short: "A simple command-line TODO editor",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		backgroundCtx := context.Background()
+		ctx := context.Background()
 
 		envFileData, _ := godotenv.Read(".env")
 
 		accessToken := envFileData["GITHUB_ACCESS_TOKEN"]
 
 		tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken})
-		tokenClient := oauth2.NewClient(backgroundCtx, tokenSource)
+		tokenClient := oauth2.NewClient(ctx, tokenSource)
 
 		githubClient := github.NewClient(tokenClient)
 
@@ -38,10 +38,20 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("could not read local gist id file (err=%s)", err)
 		}
 
-		applicationContext = applicationContext.NewApplicationContext(gistID)
+		applicationContext = &appContext.ApplicationContext{
+			GistID: gistID,
+		}
 
-		githubService = services.NewGithubService(githubClient)
-		godoService = services.NewGodoService(githubClient, gistID)
+		githubService = &services.GithubService{
+			Context:            &ctx,
+			GithubClient:       githubClient,
+			ApplicationContext: applicationContext,
+		}
+
+		godoService = &services.GodoService{
+			GithubService:      githubService,
+			ApplicationContext: applicationContext,
+		}
 
 		return nil
 	},
