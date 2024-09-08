@@ -18,7 +18,6 @@ func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
 	gistID := service.ApplicationContext.GistID
 
 	gist, _, err := service.GithubService.GetGist(gistID)
-
 	if err != nil {
 		return []model.GodoItem{}, fmt.Errorf("could not retrieve gist by id (err=%s)", err)
 	}
