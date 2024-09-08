@@ -5,6 +5,7 @@ import (
 
 	"github.com/chancehl/godo/internal/config"
 	"github.com/chancehl/godo/internal/model"
+	"github.com/chancehl/godo/internal/services"
 	"github.com/chancehl/godo/internal/utils/cli"
 	"github.com/spf13/cobra"
 )
@@ -95,7 +96,7 @@ func findExistingGodoGist() (*GodoGistData, error) {
 	}
 
 	for _, gist := range gists {
-		if gist.Description != nil && *gist.Description == "godo" {
+		if gist.Description != nil && *gist.Description == services.GistFileDescription {
 			return &GodoGistData{id: *gist.ID, url: gist.GetHTMLURL()}, nil
 		}
 	}

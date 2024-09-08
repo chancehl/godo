@@ -31,7 +31,7 @@ func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
 		return []model.GodoItem{}, err
 	}
 
-	content := *gist.Files["godo.json"].Content
+	content := *gist.Files[GistFileName].Content
 
 	var items []model.GodoItem
 

@@ -9,6 +9,10 @@ import (
 	"github.com/google/go-github/v50/github"
 )
 
+const GistFileDescription = "godo"
+const GistFilePublic = false
+const GistFileName = "godo.json"
+
 type githubService interface {
 	CreateGist(godos []model.GodoItem) (string, string, error)
 	GetGists() ([]*github.Gist, *github.Response, error)
@@ -29,10 +33,10 @@ func (service *GithubService) CreateGist(godos []model.GodoItem) (string, string
 	gistContent, _ := json.Marshal(godos)
 
 	gist := &github.Gist{
-		Description: github.String("godo"),
-		Public:      github.Bool(false),
+		Description: github.String(GistFileDescription),
+		Public:      github.Bool(GistFilePublic),
 		Files: map[github.GistFilename]github.GistFile{
-			"godo.json": {
+			GistFileName: {
 				Content: github.String(string(gistContent)),
 			},
 		},
