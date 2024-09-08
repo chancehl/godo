@@ -36,13 +36,11 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("could not fetch godos from GitHub (%s)", err)
 	}
 
-	idExists := checkIfIdExists(itemID, godos)
-	if !idExists {
+	if !doesIdExist(itemID, godos) {
 		return fmt.Errorf("item id %d not found", itemID)
 	}
 
-	alreadyComplete := checkIfItemIsAlreadyComplete(itemID, godos)
-	if alreadyComplete {
+	if isAlreadyComplete(itemID, godos) {
 		return fmt.Errorf("item %d is already complete", itemID)
 	}
 
@@ -68,7 +66,7 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func checkIfIdExists(id int, items []model.GodoItem) bool {
+func doesIdExist(id int, items []model.GodoItem) bool {
 	for _, item := range items {
 		if item.ID == id {
 			return true
@@ -77,7 +75,7 @@ func checkIfIdExists(id int, items []model.GodoItem) bool {
 	return false
 }
 
-func checkIfItemIsAlreadyComplete(id int, items []model.GodoItem) bool {
+func isAlreadyComplete(id int, items []model.GodoItem) bool {
 	for _, item := range items {
 		if item.ID == id && item.Status == "COMPLETE" {
 			return true
