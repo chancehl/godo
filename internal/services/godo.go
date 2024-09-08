@@ -17,10 +17,10 @@ type GodoService struct {
 func (service *GodoService) GetGodos() ([]model.GodoItem, error) {
 	gistID := service.ApplicationContext.GistID
 
-	gist, resp, err := service.GithubService.GetGist(gistID)
+	gist, _, err := service.GithubService.GetGist(gistID)
 
-	if err != nil || resp.StatusCode != 200 {
-		return []model.GodoItem{}, err
+	if err != nil {
+		return []model.GodoItem{}, fmt.Errorf("could not retrieve gist by id (err=%s)", err)
 	}
 
 	content := *gist.Files[GistFileName].Content
