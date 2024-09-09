@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+const DotDirectory = ".godo"
+const GistFile = "gist_file_id"
+
 func dirExists(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -24,7 +27,7 @@ func InitializeDotDir() error {
 		return fmt.Errorf("error getting user home directory: %w", err)
 	}
 
-	dotDirPath := filepath.Join(homeDir, ".godo")
+	dotDirPath := filepath.Join(homeDir, DotDirectory)
 	exists, err := dirExists(dotDirPath)
 	if err != nil {
 		return err
@@ -45,7 +48,7 @@ func CheckIfGistIdFileExists() (bool, error) {
 		return false, fmt.Errorf("error getting user home directory: %w", err)
 	}
 
-	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+	path := filepath.Join(homeDir, DotDirectory, GistFile)
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return false, nil
@@ -62,7 +65,7 @@ func WriteGistIdFile(id string) (string, error) {
 		return "", fmt.Errorf("error getting user home directory: %w", err)
 	}
 
-	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+	path := filepath.Join(homeDir, DotDirectory, GistFile)
 	if err := os.WriteFile(path, []byte(id), 0644); err != nil {
 		return "", fmt.Errorf("error writing gist_id file: %w", err)
 	}
@@ -76,7 +79,7 @@ func ReadGistIdFile() (string, error) {
 		return "", fmt.Errorf("error getting user home directory: %w", err)
 	}
 
-	path := filepath.Join(homeDir, ".godo", "gist_file_id")
+	path := filepath.Join(homeDir, DotDirectory, GistFile)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("error reading gist_id file: %w", err)
