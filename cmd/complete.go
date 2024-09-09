@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const complete = "COMPLETE"
+
 var deleteGodoItem bool
 
 func init() {
@@ -48,8 +50,8 @@ func executeComplete(cmd *cobra.Command, args []string) error {
 
 	for _, godo := range godos {
 		if godo.ID == itemID {
+			godo.Status = complete
 			godo.CompletedOn = time.Now().UTC().Format(time.RFC3339)
-			godo.Status = "COMPLETE"
 
 			if deleteGodoItem {
 				continue
@@ -77,7 +79,7 @@ func doesIdExist(id int, items []model.GodoItem) bool {
 
 func isAlreadyComplete(id int, items []model.GodoItem) bool {
 	for _, item := range items {
-		if item.ID == id && item.Status == "COMPLETE" {
+		if item.ID == id && item.Status == complete {
 			return true
 		}
 	}
