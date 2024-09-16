@@ -79,8 +79,7 @@ func ReadGistIdFile() (string, error) {
 		return "", fmt.Errorf("error getting user home directory: %w", err)
 	}
 
-	path := filepath.Join(homeDir, DotDirectory, GistFile)
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(filepath.Join(homeDir, DotDirectory, GistFile))
 	if err != nil {
 		return "", fmt.Errorf("error reading gist_id file: %w", err)
 	}
